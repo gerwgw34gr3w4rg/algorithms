@@ -1,7 +1,3 @@
-#include <stdio.h>
-
-
-
 #include <inttypes.h>
 #include <stdbool.h>
 
@@ -17,7 +13,7 @@ void ascii_to_uint64(const char *digits, uint64_t *number, bool *is_convertion_v
         Must contain exactly one valid subsequence of the form "(+)dd...d", where:
         The '+' is optional.
         The sequence must contain at least one digit.
-        The total string length must not exceed 10 million characters.
+        The total string length must not exceed 1000 characters.
         The digit sequence must represent a value that fits in a uint64_t.
     @param number
         A pointer to a uint64_t where the result of the conversion will be stored.
@@ -31,7 +27,7 @@ void ascii_to_uint64(const char *digits, uint64_t *number, bool *is_convertion_v
         No valid digit sequence is found.
         More than one valid sequence is found.
         The digit sequence causes an overflow.
-        The input exceeds 10 million characters.
+        The input exceeds 1000 characters.
         
     @note
         There is no return value. Results are communicated via the number and
