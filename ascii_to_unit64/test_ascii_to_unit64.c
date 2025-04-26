@@ -45,7 +45,7 @@ int main(){
     };
     size_t test_cases_size = sizeof(test_cases) / sizeof(test_cases[0]);
 
-#if 0
+
     for (size_t i = 0; i < test_cases_size; i++){
         uint64_t number = 150;
         bool is_convertion_valid;
@@ -54,10 +54,9 @@ int main(){
         assert(is_convertion_valid == test_cases[i].is_convertion_valid);
     }
 
-#endif
     uint64_t n;
     bool flag;
-    // ascii_to_uint64(NULL, NULL, NULL); //abort
+    //ascii_to_uint64(NULL, NULL, NULL); //abort
     // ascii_to_uint64("", NULL, NULL); //abort
     // ascii_to_uint64("", &n, NULL); //abort
     // ascii_to_uint64("", NULL, &flag); //abort
