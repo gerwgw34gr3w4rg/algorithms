@@ -9,7 +9,8 @@
 #include <iso646.h>
 
 
-static const char *get_starting_point(const char *digits, bool *is_format_valid);
+static const char *get_starting_point(const char *digits);
+bool is_digit(char c);
 
 
 void ascii_to_uint64(const char *digits, uint64_t *number, bool *is_convertion_valid){
@@ -71,11 +72,27 @@ void ascii_to_uint64(const char *digits, uint64_t *number, bool *is_convertion_v
 		fprintf(stderr, "NULL POINTER ERROR: %s: %s(): line: %d\n",
  	 	        __FILE__, __FUNCTION__, __LINE__ - 2);
  	 	abort();
- 	}	
+ 	}
+	*number = (uint64_t)0;
+	const char *digits_start = get_starting_point(digits);
+	if (NULL == digits_start){
+		is_convertion_valid = false;
+		return;
+	}
+	for(size_t i = 0; is_digit(digits_start[i]); i++){
+		uint64_t tmp = *number * 10 + digits_start[i] - '0';
+		if (tmp < *number){ //Overflow check
+			*number = 0;
+			*is_convertion_valid = false;
+			return;
+		}
+		*number = tmp;
+	}
+	*is_convertion_valid = true;
 }
 
 
-static const char *get_starting_point(const char *digits, bool *is_format_valid){
+static const char *get_starting_point(const char *digits){
 	/*
 	* @brief Locates the start of a valid unsigned integer sequence within a string.
 	*
@@ -89,89 +106,74 @@ static const char *get_starting_point(const char *digits, bool *is_format_valid)
 	*      - Must contain exactly one contiguous numeric sequence, optionally prefixed by a '+'.
 	*      - The string must not exceed 1000 characters in total length.
 	*
-	* @param is_format_valid
-	*      A pointer to a `bool` where the format validation result will be stored:
-	*      - Set to `true` if a valid subsequence is found and correctly formatted.
-	*      - Set to `false` if the string does not match the required format.
-	*
 	* @return
 	*      - A pointer to the beginning of the valid digit sequence (after any optional '+').
 	*      - NULL if the input does not contain a valid sequence.
 	*
 	* @note
 	*      This function does not modify the input string.
-	*      If no valid numeric sequence is found, `is_format_valid` will be set to `false`.
 	*
 	* @examples
-	*      bool is_format_valid;
 	*
-	*      char *start = get_starting_point("  +517\n", &is_format_valid);
-	*      assert(is_format_valid == true);
-	*      // 'start' points to '5'
+	*      char *start = get_starting_point("  +517\n");
+	*      assert(start == "  +517\n" + 3);  // 'start' points to '5'
 	*
-	*      char *start = get_starting_point("abc123", &is_format_valid);
-	*      assert(is_format_valid == false);
+	*      char *start = get_starting_point("abc123");
 	*      assert(NULL == start);
 	*/
 	if (NULL == digits){
 		fprintf(stderr, "NULL POINTER ERROR: %s: %s(): line: %d\n",
-				__FILE__, __FUNCTION__, __LINE__ - 2);
-		abort();
-	}
-	if (NULL == is_format_valid){
-		fprintf(stderr, "NULL POINTER ERROR: %s: %s(): line: %d\n",
-				__FILE__, __FUNCTION__, __LINE__ - 2);
-		abort();
-	}
-	bool is_plus_exits = false;
-	*is_format_valid = true;
-	char *digits_start = NULL;
-	size_t i = 0;
-	while (digits[i] != '\0'){
-		if('+' == digits[i]){
-			if(is_plus_exits == true){
-				*is_format_valid = false;
-				return NULL;
-			}
-			if('\0' == digits[i + 1]){
-				is_format_valid = false;
-			}
-			if(digits[i + 1] >= '0' and digits[i + 1] <= '9'){
-				is_plus_exits = true;
-			}
-			else {
-				*is_format_valid = false;
-				return NULL;
-			}
-		}
-		if(digits[i] >= '0' and digits[i] <= '9'){
-			if (NULL == digits_start){
-				digits_start = (char *)digits + i;
-			}
-			else {
-				*is_format_valid = false;
-				return NULL;
-			}
-			while (digits[i] >= '0' and digits[i] <= '9'){
-				i++;
-			}			
-		}
-		else if (' ' == digits[i] or '\t' == digits[i] or '\n' == digits[i]){
-			i++;
-		}
-		else {
-			*is_format_valid = false;
-			return NULL;
-		}
-	}
-	const size_t STRING_SIZE_LIMIT = (size_t)1000;
-	if (i > STRING_SIZE_LIMIT){
-		*is_format_valid = false;
-		return NULL;
-	}
-	if (NULL == digits_start){
-		*is_format_valid = false;
-		return NULL;
-	}
-	return (const char *)digits_start;
+	 	        __FILE__, __FUNCTION__, __LINE__ - 2);
+	 	abort();
+ 	}
+ 	bool is_plus_exists = false;
+ 	char *digits_start = NULL;
+ 	size_t i = 0;
+ 	while (digits[i] != '\0'){
+ 		if ('+' == digits[i]){
+ 			if (is_plus_exists == true){
+ 				return NULL;
+ 			}
+ 			is_plus_exists = true;
+ 			i++;
+ 			if ('\0' == digits[i] or not is_digit(digits[i])){
+ 				return NULL;
+ 			}
+ 		}
+ 		if (is_digit(digits[i])){
+ 			if (NULL == digits_start){
+ 				digits_start = (char *)digits + i;
+ 			}
+ 			else {
+ 				return NULL;
+ 			}
+ 			while (is_digit(digits[i])){
+ 				i++;
+ 			}
+ 		}
+ 		else if (' ' == digits[i] or '\t' == digits[i] or '\n' == digits[i]){
+ 			i++;
+ 		}
+ 		else {
+ 			return NULL;
+ 		}
+ 	}
+ 	const size_t STRING_SIZE_LIMIT = (size_t)1000;
+ 	if (i > STRING_SIZE_LIMIT){
+ 		return NULL;
+ 	}
+ 	return (const char *)digits_start;
+}
+
+
+bool is_digit(char c){
+	/*
+	@brief Checks if a character is a decimal digit (0–9).*
+	@param c
+	The ASCII character to check.*
+	@return
+	true if the character is a digit; false otherwise.
+	*/
+
+	return c >= '0' and c <= '9';
 }

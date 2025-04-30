@@ -30,9 +30,9 @@ int main(){
         {.digits = "\n\n-1234\n", .number = 0, .is_convertion_valid = false},
         {.digits = "wef3ifn4 !whsiio? wihjnbk346543562", .number = 0, .is_convertion_valid = false},
         {.digits = "78234213137829837899011345", .number = 0, .is_convertion_valid = false},
-        {.digits = "+9", .number = 0, .is_convertion_valid = false},
         {.digits = "", .number = 0, .is_convertion_valid = false},
         //Valid cases
+        {.digits = "+9", .number = (uint64_t)9, .is_convertion_valid = true},
         {.digits = "0", .number = (uint64_t)0, .is_convertion_valid = true},
         {.digits = "+0", .number = (uint64_t)0, .is_convertion_valid = true},
         {.digits = "123", .number = (uint64_t)123, .is_convertion_valid = true},
@@ -50,17 +50,26 @@ int main(){
         uint64_t number = 150;
         bool is_convertion_valid;
         ascii_to_uint64(test_cases[i].digits, &number, &is_convertion_valid);
+        if(number != test_cases[i].number or is_convertion_valid != test_cases[i].is_convertion_valid){
+            fprintf(stderr, "Number test = %d Error\n", (int)i);
+            fprintf(stderr, "Input string:|%s|\n", test_cases[i].digits);
+            fprintf(stderr, "Result number %" PRIu64 "\n", number);
+        }
         assert(number == test_cases[i].number);
         assert(is_convertion_valid == test_cases[i].is_convertion_valid);
     }
 
-    uint64_t n;
-    bool flag;
-    //ascii_to_uint64(NULL, NULL, NULL); //abort
+    // uint64_t n;
+    // bool flag;
+    // ascii_to_uint64(NULL, NULL, NULL); //abort
     // ascii_to_uint64("", NULL, NULL); //abort
     // ascii_to_uint64("", &n, NULL); //abort
     // ascii_to_uint64("", NULL, &flag); //abort
     // ascii_to_uint64(NULL, &n, NULL); //abort
     // ascii_to_uint64(NULL, &n, &flag); //abort
     // ascii_to_uint64(NULL, NULL, &flag); //abort
+
+
+    printf("\n%s done!\n", __FILE__);
 }
+
