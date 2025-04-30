@@ -27,6 +27,8 @@ int main(){
 		// Invalid cases
 		{.digits = "",				.digits_start = NULL, .is_format_valid = false},
 		{.digits = " ",				.digits_start = NULL, .is_format_valid = false},
+		{.digits = "\n",				.digits_start = NULL, .is_format_valid = false},
+		{.digits = "\t",				.digits_start = NULL, .is_format_valid = false},
 		{.digits = "145 51451 15", 	.digits_start = NULL, .is_format_valid = false},
 		{.digits = "+", 			.digits_start = NULL, .is_format_valid = false},
 		{.digits = "\n\n-1234\n", 				.digits_start = NULL, .is_format_valid = false},

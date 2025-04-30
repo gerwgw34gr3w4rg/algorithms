@@ -84,6 +84,7 @@ void ascii_to_uint64(const char *digits, uint64_t *number, bool *is_convertion_v
 		if (tmp < *number){ //Overflow check
 			*number = 0;
 			*is_convertion_valid = false;
+			printf("The number is too large for a 64-bit unsigned type\n");
 			return;
 		}
 		*number = tmp;
@@ -126,17 +127,22 @@ static const char *get_starting_point(const char *digits){
 	 	        __FILE__, __FUNCTION__, __LINE__ - 2);
 	 	abort();
  	}
+ 	const size_t STRING_SIZE_LIMIT = (size_t)1000;
  	bool is_plus_exists = false;
  	char *digits_start = NULL;
  	size_t i = 0;
  	while (digits[i] != '\0'){
  		if ('+' == digits[i]){
  			if (is_plus_exists == true){
+				fprintf(stderr, "There can only be one '+' sign in a"
+								" line before a number, like \"+584\"\n");
  				return NULL;
  			}
  			is_plus_exists = true;
  			i++;
  			if ('\0' == digits[i] or not is_digit(digits[i])){
+				fprintf(stderr, "There can only be one '+' sign in a"
+								" line before a number, like \"+584\"\n");
  				return NULL;
  			}
  		}
@@ -145,23 +151,35 @@ static const char *get_starting_point(const char *digits){
  				digits_start = (char *)digits + i;
  			}
  			else {
+				fprintf(stderr, "The string must contain exactly one"
+								" continuous numerical sequence\n");
  				return NULL;
  			}
  			while (is_digit(digits[i])){
  				i++;
+			 	if (i > STRING_SIZE_LIMIT){
+					fprintf(stderr, "There are more than %d characters in a string\n", (int)STRING_SIZE_LIMIT);
+					return NULL;
+				}
  			}
  		}
  		else if (' ' == digits[i] or '\t' == digits[i] or '\n' == digits[i]){
  			i++;
  		}
  		else {
+			fprintf(stderr, "The string must contain only one"
+							" number and whitespace characters (' ', '\\t', '\\n')\n");
  			return NULL;
  		}
+	 	if (i > STRING_SIZE_LIMIT){
+			fprintf(stderr, "There are more than %d characters in a string\n", (int)STRING_SIZE_LIMIT);
+			return NULL;
+		}
  	}
- 	const size_t STRING_SIZE_LIMIT = (size_t)1000;
- 	if (i > STRING_SIZE_LIMIT){
- 		return NULL;
- 	}
+
+	if(NULL == digits_start){
+		fprintf(stderr, "The string must contain at least one digit\n");
+	}
  	return (const char *)digits_start;
 }
 

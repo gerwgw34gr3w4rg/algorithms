@@ -30,7 +30,6 @@ int main(){
         {.digits = "\n\n-1234\n", .number = 0, .is_convertion_valid = false},
         {.digits = "wef3ifn4 !whsiio? wihjnbk346543562", .number = 0, .is_convertion_valid = false},
         {.digits = "78234213137829837899011345", .number = 0, .is_convertion_valid = false},
-        {.digits = "", .number = 0, .is_convertion_valid = false},
         //Valid cases
         {.digits = "+9", .number = (uint64_t)9, .is_convertion_valid = true},
         {.digits = "0", .number = (uint64_t)0, .is_convertion_valid = true},
